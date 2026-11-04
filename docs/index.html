@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Справка — Интеллектуальный тренажёр</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    :root { --theme-color: #2458a6; }
+    .markdown-section { max-width: 850px; }
+    .markdown-section img { max-width: 100%; border-radius: 12px; }
+    .markdown-section u { text-underline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <div id="app">Загрузка справки…</div>
+  <noscript>Для просмотра сайта включите JavaScript.</noscript>
+  <script>
+    window.$docsify = {
+      name: 'Справка тренажёра',
+      loadSidebar: true,
+      alias: { '/.*/_sidebar.md': '/_sidebar.md' },
+      subMaxLevel: 2,
+      auto2top: true,
+      relativePath: true,
+      routerMode: 'hash'
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+</body>
+</html>
