@@ -1,10 +1,10 @@
 //Хранит отступы и размеры формы, заголовка и маскота. 
 // Цвета и вид общих элементов берутся из существующей темы.
 import { StyleSheet } from 'react-native';
-import { colors, spacing } from '../../../ui/theme';
+import { spacing } from '../../../ui/theme';
 const passwordToggleWidth = 48;
 
-export const styles = StyleSheet.create({
+export const makeStyles = colors => StyleSheet.create({
   fill: { flex: 1 },
   content: {
     width: '100%',
@@ -39,6 +39,19 @@ export const styles = StyleSheet.create({
   submit: { marginTop: spacing.lg },
   bottomLink: { marginTop: spacing.lg, textAlign: 'center', paddingVertical: spacing.sm },
   feedback: { color: colors.text, marginTop: spacing.sm },
-  consent: { paddingVertical: spacing.sm },
   disabled: { opacity: 0.6 },
+  consentRow: { flexDirection: 'row', alignItems: 'center', marginTop: 20 },
+  consentTouch: { width: 34, minHeight: 44, justifyContent: 'center' },
+  consentBox: {
+    width: 22, height: 22, borderRadius: 6, borderWidth: 1,
+    borderColor: colors.primary, backgroundColor: colors.consentBackground,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  consentBoxChecked: { backgroundColor: colors.primary },
+  consentCheck: { color: colors.onPrimary, fontSize: 16, fontWeight: '700', lineHeight: 20 },
+  consentCopy: { flex: 1 },
+  consentText: { color: colors.muted, fontSize: 12, lineHeight: 19 },
+  consentLink: { color: colors.primary, fontSize: 12, lineHeight: 19 },
+  document: { padding: spacing.lg, gap: spacing.md },
+  documentText: { color: colors.text, fontSize: 15, lineHeight: 23 },
 });

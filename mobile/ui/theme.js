@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { useSettings } from '../src/settings/SettingsProvider';
 
 export const colors = {
   background: '#F6F1E8',
@@ -9,6 +10,8 @@ export const colors = {
   primary: '#7B60AD',
   onPrimary: '#FFFFFF',
   error: '#A82A36',
+  accent: '#527A60',
+  consentBackground: '#EAE2F3',
 };
 
 export const spacing = {
@@ -17,7 +20,7 @@ export const spacing = {
   lg: 24,
 };
 
-export const commonStyles = StyleSheet.create({
+const makeCommonStyles = colors => StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   field: {
     minHeight: 52,
@@ -45,3 +48,30 @@ export const commonStyles = StyleSheet.create({
   errorText: { color: colors.error, fontWeight: '600' , textAlign: 'center'},
   linkText: { color: colors.primary, fontSize: 14 },
 });
+
+const darkColors = {
+  background: '#18161E',
+  surface: '#25222E',
+  text: '#F4EFF7',
+  muted: '#BCB3C5',
+  border: '#494252',
+  primary: '#C7AEFF',
+  onPrimary: '#231638',
+  error: '#FF9BA5',
+  accent: '#9BC5A4',
+  consentBackground: '#3C334A',
+};
+
+export const commonStyles = makeCommonStyles(colors);
+
+const lightTheme = { colors, commonStyles, dark: false };
+const darkTheme = {
+  colors: darkColors,
+  commonStyles: makeCommonStyles(darkColors),
+  dark: true,
+};
+
+export function useAppTheme() {
+  const { app } = useSettings();
+  return app.theme === 'dark' ? darkTheme : lightTheme;
+}

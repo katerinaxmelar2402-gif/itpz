@@ -1,19 +1,22 @@
 //Рисует формы входа и регистрации. Общая разметка и поля используются в обоих режимах.
 import { useRef, useState } from 'react';
 import {
-  Alert, Image, Keyboard, KeyboardAvoidingView, Platform,
+  Image, Keyboard, KeyboardAvoidingView, Platform,
   Pressable, ScrollView, Text, TextInput, View,
 } from 'react-native';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, commonStyles } from '../../../ui/theme';
 import { useAuth } from '../../auth/AuthProvider';
 import { validateCredentials, validateRegistration } from '../../auth/validation';
-import { styles } from './AuthScreen.styles';
 import { SymbolView } from 'expo-symbols';
+import { useAppTheme } from '../../../ui/theme';
+import { makeStyles } from './AuthScreen.styles';
+
 
 /** @param {import('react-native').TextInputProps & { label: string }} props */
-function Field({ label, secureTextEntry = false, ...props }) {
+export function Field({ label, secureTextEntry = false, ...props }) {
+  const { colors, commonStyles } = useAppTheme(); 
+  const styles = makeStyles(colors);
   const [visible, setVisible] = useState(false);
   const action = visible ? 'Скрыть' : 'Показать';
 
@@ -52,6 +55,8 @@ function Field({ label, secureTextEntry = false, ...props }) {
 }
 
 export default function AuthScreen({ register = false }) {
+  const { colors, commonStyles } = useAppTheme(); 
+  const styles = makeStyles(colors);
   const { signIn, registerAccount } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -94,7 +99,9 @@ export default function AuthScreen({ register = false }) {
   return (
     <SafeAreaView style={commonStyles.screen}>
       <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}>
           <Text accessibilityRole="header" style={styles.title}>
             {register ? 'Регистрация' : 'Вход'}
           </Text>
@@ -124,18 +131,33 @@ export default function AuthScreen({ register = false }) {
                 <Field label="Повторите пароль" placeholder="Введите пароль ещё раз"
                   value={confirmation} onChangeText={setConfirmation} secureTextEntry maxLength={128}
                   autoCapitalize="none" />
-                <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: consent }}
-                  onPress={() => setConsent(value => !value)} style={styles.consent}>
-                  <Text style={styles.feedback}>
-                    {consent ? '☑ ' : '☐ '}Согласен на обработку имени и почты для создания аккаунта
-                  </Text>
-                </Pressable>
+                <View style={styles.consentRow}>
+                  <Pressable
+                    accessibilityRole="checkbox"
+                    accessibilityLabel="Согласие на обработку персональных данных"
+                    accessibilityState={{ checked: consent }}
+                    onPress={() => setConsent(value => !value)}
+                    style={styles.consentTouch}
+                    hitSlop={4}
+                  >
+                    <View style={[styles.consentBox, consent && styles.consentBoxChecked]}>
+                      {consent && <Text style={styles.consentCheck}>✓</Text>}
+                    </View>
+                  </Pressable>
+                  <View style={styles.consentCopy}>
+                    <Link href="/legal/consent" style={styles.consentText}>
+                      Согласен на обработку персональных данных
+                    </Link>
+                    <Link href="/legal/privacy" style={styles.consentLink}>
+                      и ознакомлен с политикой конфиденциальности
+                    </Link>
+                  </View>
+                </View>
               </>
             ) : (
-              <Pressable accessibilityRole="button" style={styles.forgot}
-                onPress={() => Alert.alert('Восстановление пароля', 'Отправка писем ещё не подключена.')}>
-                <Text style={commonStyles.linkText}>Забыли пароль?</Text>
-              </Pressable>
+              <Link href="/reset-password" style={[styles.forgot, commonStyles.linkText]}>
+                Забыли пароль?
+              </Link>
             )}
 
             {!!error && (

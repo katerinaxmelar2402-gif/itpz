@@ -18,14 +18,20 @@ CREATE TABLE `users` (
   UNIQUE KEY `uq_users_email` (`email`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `auth_tokens` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `user_id` BIGINT NOT NULL,
-  `token_hash` VARCHAR(255) NOT NULL,
-  `purpose` VARCHAR(20) NOT NULL,
-  `expires_at` DATETIME NOT NULL,
-  `revoked_at` DATETIME NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE auth_sessions (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  access_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  refresh_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  access_expires_at DATETIME NOT NULL,
+  refresh_expires_at DATETIME NOT NULL,
+  revoked_at DATETIME NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_auth_sessions_access_hash (access_hash),
+  UNIQUE KEY uq_auth_sessions_refresh_hash (refresh_hash),
+  KEY ix_auth_sessions_user_id (user_id),
+  CONSTRAINT fk_auth_sessions_user_id
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 CREATE TABLE `materials` (
@@ -170,7 +176,16 @@ CREATE TABLE `session_answers` (
   UNIQUE KEY `uq_answer_occurrence` (`session_question_id`, `occurrence_no`)
 ) ENGINE=InnoDB;
 
-ALTER TABLE `auth_tokens` ADD CONSTRAINT `fk_auth_tokens_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT;
+CREATE TABLE password_resets (
+  user_id BIGINT NOT NULL,
+  code_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  expires_at DATETIME NOT NULL,
+  resend_after DATETIME NOT NULL,
+  attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id),
+  CONSTRAINT fk_password_resets_user_id
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 ALTER TABLE `materials` ADD CONSTRAINT `fk_materials_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT;
 

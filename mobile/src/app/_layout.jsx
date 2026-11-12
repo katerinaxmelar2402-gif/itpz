@@ -2,16 +2,21 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, Button, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, commonStyles } from '../../ui/theme';
+import { useAppTheme } from '../../ui/theme';
 import { AuthProvider, useAuth } from '../auth/AuthProvider';
+import { SettingsProvider, useSettings } from '../settings/SettingsProvider';
 
 function Navigation() {
   const { session, loading, error, retry } = useAuth();
+  const { colors, commonStyles, dark } = useAppTheme();
+  const { loading: settingsLoading } = useSettings();
 
-  if (loading || error) {
+  if (loading || settingsLoading || error) {
     return (
       <SafeAreaView style={[commonStyles.screen, { justifyContent: 'center', padding: 24 }]}>
-        {loading ? <ActivityIndicator color={colors.primary} /> : (
+        {loading || settingsLoading ? (
+          <ActivityIndicator color={colors.primary} />
+        ) : (
           <>
             <Text style={{ color: colors.text }}>{error}</Text>
             <Button title="Повторить" onPress={retry} />
@@ -22,24 +27,46 @@ function Navigation() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-      <Stack.Protected guard={!session}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="register" />
-      </Stack.Protected>
-      <Stack.Protected guard={!!session}>
-        <Stack.Screen name="home" />
-      </Stack.Protected>
-      <Stack.Screen name="help" options={{ headerShown: true, title: 'Справка' }} />
-    </Stack>
+    <>
+      <StatusBar style={dark ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+        <Stack.Protected guard={!session}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="register" />
+          <Stack.Screen name="reset-password" />
+        </Stack.Protected>
+        <Stack.Protected guard={!!session}>
+          <Stack.Screen name="(tabs)" />
+        </Stack.Protected>
+
+        <Stack.Screen
+          name="help"
+          options={{
+            headerShown: true,
+            title: 'Справка',
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
+          name="legal/[document]"
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+      </Stack>
+    </>
   );
 }
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <StatusBar style="dark" />
-      <Navigation />
+      <SettingsProvider>
+        <Navigation />
+      </SettingsProvider>
     </AuthProvider>
   );
 }

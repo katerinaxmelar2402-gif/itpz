@@ -3,11 +3,13 @@ import { ActivityIndicator, BackHandler, Button, ScrollView, StyleSheet, Text, V
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Markdown, { FitImage, MarkdownIt } from 'react-native-markdown-display';
 import { absoluteImagesPlugin, normalizeBase, resolveDocLink, underlinePlugin } from './docs-helpers.mjs';
+import { useAppTheme } from '../../../ui/theme';
 
 const DOCS_BASE = normalizeBase('https://katerinaxmelar2402-gif.github.io/itpz/');
 const HOME = new URL('README.md', DOCS_BASE).href;
 
 export default function HelpScreen() {
+  const { colors, commonStyles } = useAppTheme();
   const [history, setHistory] = useState([HOME]);
   const [reload, setReload] = useState(0);
   const [content, setContent] = useState('');
@@ -88,16 +90,26 @@ export default function HelpScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <View style={styles.toolbar}>
+    <SafeAreaView style={commonStyles.screen}>
+      <View style={[styles.toolbar, { borderBottomColor: colors.border }]}>
         <Button title="Назад" disabled={history.length < 2} onPress={() => setHistory(items => items.slice(0, -1))} />
-        <Text style={styles.title}>Справка</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Справка</Text>
         <Button title="Главная" onPress={() => setHistory([HOME])} />
       </View>
       {loading ? <ActivityIndicator size="large" accessibilityLabel="Загрузка справки" style={styles.loader} /> : null}
-      {error ? <View style={styles.error}><Text accessibilityRole="alert">{error}</Text><Button title="Повторить" onPress={() => setReload(n => n + 1)} /></View> : null}
-      <ScrollView ref={scroll} contentContainerStyle={styles.content}>
-        <Markdown markdownit={parser} rules={rules} onLinkPress={onLinkPress} style={markdownStyles}>
+      {error ? <View style={[styles.error, { backgroundColor: colors.surface }]}><Text accessibilityRole="alert" style={{ color: colors.error }}>{error}</Text><Button title="Повторить" onPress={() => setReload(n => n + 1)} /></View> : null}
+      <ScrollView ref={scroll} contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}>
+        <Markdown markdownit={parser} rules={rules} onLinkPress={onLinkPress} style={{
+                      ...markdownStyles,
+                      body: { ...markdownStyles.body, color: colors.text },
+                      link: { color: colors.primary },
+                      fence: { ...markdownStyles.fence, backgroundColor: colors.surface },
+                      code_inline: { backgroundColor: colors.surface, borderColor: colors.border },
+                      code_block: { backgroundColor: colors.surface, borderColor: colors.border },
+                      blockquote: { backgroundColor: colors.surface, borderColor: colors.border },
+                    }}>
           {content}
         </Markdown>
       </ScrollView>
