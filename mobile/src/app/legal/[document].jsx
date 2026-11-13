@@ -14,7 +14,12 @@ export default function LegalDocumentRoute() {
   return (
     <>
       <Stack.Screen options={{ title: selected?.title ?? 'Документ' }} />
-      <ScrollView style={commonStyles.screen} contentContainerStyle={styles.document}>
+      <ScrollView
+        style={commonStyles.screen}
+        contentContainerStyle={styles.document}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
         {selected ? selected.paragraphs.map((paragraph, index) => (
           <Text key={index} style={styles.documentText}>{paragraph}</Text>
         )) : <Text style={styles.documentText}>Документ не найден.</Text>}

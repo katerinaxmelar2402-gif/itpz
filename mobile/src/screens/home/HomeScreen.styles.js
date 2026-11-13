@@ -87,7 +87,7 @@ export const makeStyles = (colors, dark) => {
     },
     battleButton: {
       alignSelf: 'flex-start',
-      minHeight: 38,
+      minHeight: 44,
       paddingHorizontal: 16,
       paddingVertical: 10,
       justifyContent: 'center',
@@ -182,6 +182,15 @@ export const makeStyles = (colors, dark) => {
     chevron: {
       color: green,
       fontSize: 24,
+    },
+    pressed: {
+      opacity: 0.75,
+    },
+    allButton: {
+      minWidth: 48,
+      minHeight: 44,
+      alignItems: 'flex-end',
+      justifyContent: 'center',
     },
   });
 };

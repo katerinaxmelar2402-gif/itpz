@@ -12,6 +12,7 @@ export const colors = {
   error: '#A82A36',
   accent: '#527A60',
   consentBackground: '#EAE2F3',
+  dialogBackground: '#EBD5B6',
 };
 
 export const spacing = {
@@ -60,6 +61,7 @@ const darkColors = {
   error: '#FF9BA5',
   accent: '#9BC5A4',
   consentBackground: '#3C334A',
+  dialogBackground: '#403529',
 };
 
 export const commonStyles = makeCommonStyles(colors);

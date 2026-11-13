@@ -37,6 +37,32 @@ function Navigation() {
         </Stack.Protected>
         <Stack.Protected guard={!!session}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="create-collection"
+            options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+            name="create-method"
+            options={{
+              headerShown: true,
+              title: 'Создание набора',
+              headerStyle: { backgroundColor: colors.background },
+              headerTintColor: colors.text,
+              headerShadowVisible: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="connect-set"
+            options={{
+              headerShown: true,
+              title: 'Добавление набора',
+              headerStyle: { backgroundColor: colors.background },
+              headerTintColor: colors.text,
+              headerShadowVisible: false,
+            }}
+          />
         </Stack.Protected>
 
         <Stack.Screen

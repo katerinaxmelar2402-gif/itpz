@@ -1,4 +1,5 @@
-import { ScrollView, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '../../../ui/theme';
@@ -10,10 +11,14 @@ export default function CreateMethodScreen() {
 
   return (
     <SafeAreaView
-      edges={['top', 'left', 'right']}
+      edges={['bottom', 'left', 'right']}
       style={commonStyles.screen}
     >
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
         <Text accessibilityRole="header" style={styles.title}>
           Создать набор
         </Text>
@@ -22,15 +27,15 @@ export default function CreateMethodScreen() {
           Как будем готовить вопросы?
         </Text>
 
-        <Text style={styles.eyebrow}>
-          ДВА СПОСОБА — ОДИН АРХИВ
-        </Text>
-
         <View style={styles.methods}>
-          <View
+          <Pressable
             accessibilityRole="button"
-            accessibilityState={{ disabled: true }}
-            style={[styles.methodCard, styles.manualCard]}
+            onPress={() => router.push('/create-collection')}
+            style={({ pressed }) => [
+              styles.methodCard,
+              styles.manualCard,
+              pressed && { opacity: 0.8 },
+            ]}
           >
             <View style={styles.iconBox}>
               <Text style={[styles.icon, styles.manualAccent]}>+</Text>
@@ -48,7 +53,7 @@ export default function CreateMethodScreen() {
             </View>
 
             <Text style={[styles.arrow, styles.manualAccent]}>→</Text>
-          </View>
+          </Pressable>  
 
           <View
             accessibilityRole="button"

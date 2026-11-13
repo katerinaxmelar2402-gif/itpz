@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { ApiError, authRequest } from './api';
+import { ApiError, apiRequest, authRequest } from './api';
 
 /**
  * @typedef {{token: string, refreshToken: string}} Tokens
@@ -17,6 +17,10 @@ import { ApiError, authRequest } from './api';
  *   updateProfile: (data: {
  *     name: string, email: string, currentPassword: string, newPassword: string
  *   }) => Promise<void>,
+ *   request: (
+ *     path: string,
+ *     options?: {method?: string, body?: object}
+ *   ) => Promise<any>,
  * }} AuthState
  */
 
@@ -66,13 +70,92 @@ async function restoreSession() {
 
 /** @param {{children: import('react').ReactNode}} props */
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(/** @type {Session | null} */ (null));
+  const [session, setSessionState] = useState(
+    /** @type {Session | null} */ (null)
+  );
+
+  const sessionRef = useRef(
+    /** @type {Session | null} */ (null)
+  );
+
+  /** @param {Session | null} next */
+  const setSession = useCallback(next => {
+    sessionRef.current = next;
+    setSessionState(next);
+  }, []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const pending = useRef(/** @type {Promise<Session | null> | null} */ (null));
   const leaving = useRef(false);
   const editing = useRef(false);
+  const request = useCallback(async (path, options = {}) => {
+    let current = sessionRef.current;
+
+    if (!current || leaving.current) {
+      throw new ApiError(401, 'Требуется вход в аккаунт.');
+    }
+
+    const send = token => apiRequest(path, {
+      ...options,
+      token,
+    });
+
+    try {
+      return await send(current.token);
+    } catch (error) {
+      if (!isUnauthorized(error)) throw error;
+
+      // Не начинаем обновление одновременно с выходом
+      // или сохранением профиля.
+      if (leaving.current || editing.current) {
+        throw new Error('Повторите действие через несколько секунд.');
+      }
+
+      const latest = sessionRef.current;
+
+      // За время запроса пользователь мог выйти
+      // или войти в другой аккаунт.
+      if (!latest || latest.refreshToken !== current.refreshToken) {
+        throw new ApiError(401, 'Состояние аккаунта изменилось.');
+      }
+
+      if (latest.token !== current.token) {
+        // Другой запрос уже получил новый короткий токен.
+        current = latest;
+      } else {
+        const expectedRefreshToken = current.refreshToken;
+
+        // Одно общее обновление для параллельных запросов.
+        pending.current ??= restoreSession().finally(() => {
+          pending.current = null;
+        });
+
+        const restored = await pending.current;
+
+        if (
+          leaving.current
+          || sessionRef.current?.refreshToken !== expectedRefreshToken
+        ) {
+          throw new ApiError(401, 'Состояние аккаунта изменилось.');
+        }
+
+        setSession(restored);
+
+        if (!restored) {
+          throw new ApiError(
+            401,
+            'Сохранённый вход больше недействителен. Войдите снова.',
+          );
+        }
+
+        current = restored;
+      }
+
+      // Повторяем исходный запрос с новым токеном.
+      return send(current.token);
+    }
+  }, [setSession]);
 
   useEffect(() => {
     let active = true;
@@ -98,7 +181,7 @@ export function AuthProvider({ children }) {
 
     restore();
     return () => { active = false; };
-  }, [attempt]);
+  }, [attempt, setSession]);
 
   useEffect(() => {
     if (!session) return;
@@ -117,7 +200,7 @@ export function AuthProvider({ children }) {
       active = false;
       subscription.remove();
     };
-  }, [session]);
+  }, [session, setSession]);
 
   function retry() {
     setError('');
@@ -192,7 +275,19 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, loading, error, retry, signIn, registerAccount, signOut, updateProfile }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        loading,
+        error,
+        retry,
+        signIn,
+        registerAccount,
+        signOut,
+        updateProfile,
+        request,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

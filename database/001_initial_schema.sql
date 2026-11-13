@@ -72,7 +72,6 @@ CREATE TABLE `question_sets` (
   `author_id` BIGINT NOT NULL,
   `source_material_id` BIGINT NULL,
   `title` VARCHAR(255) NOT NULL,
-  `topic` VARCHAR(255) NOT NULL,
   `description` TEXT NULL,
   `creation_method` VARCHAR(8) NOT NULL,
   `visibility` VARCHAR(8) NOT NULL,
@@ -84,6 +83,11 @@ CREATE TABLE `question_sets` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sets_access_key` (`access_key`)
 ) ENGINE=InnoDB;
+
+ALTER TABLE question_sets
+  MODIFY COLUMN author_id BIGINT NULL,
+  ADD COLUMN system_code VARCHAR(64) NULL,
+  ADD UNIQUE KEY uq_question_sets_system_code (system_code);
 
 CREATE TABLE `questions` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -126,7 +130,6 @@ CREATE TABLE `session_sets` (
   `session_id` BIGINT NOT NULL,
   `set_id` BIGINT NULL,
   `set_title_snapshot` VARCHAR(255) NOT NULL,
-  `topic_snapshot` VARCHAR(255) NOT NULL,
   `visible_in_statistics` BOOLEAN NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;

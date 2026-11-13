@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('./db');
 const authRoutes = require('./auth/routes');
+const collectionRoutes = require('./collections/routes');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -23,6 +24,11 @@ app.get('/api/health', async (req, res) => {
 });
 
 app.use('/api/auth', express.json({ limit: '8kb' }), authRoutes);
+app.use(
+  '/api/collections',
+  express.json({ limit: '256kb' }),
+  collectionRoutes,
+);
 
 app.listen(port, '127.0.0.1', () => {
   console.log(`Сервер запущен: http://127.0.0.1:${port}`);

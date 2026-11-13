@@ -1,5 +1,5 @@
-import SectionScreen from '../../screens/SectionScreen';
+import CollectionsScreen from '../../screens/collections/CollectionsScreen';
 
 export default function CollectionsRoute() {
-  return <SectionScreen title="Коллекции" />;
+  return <CollectionsScreen />;
 }

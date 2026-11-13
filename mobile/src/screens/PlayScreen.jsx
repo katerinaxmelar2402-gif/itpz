@@ -32,7 +32,12 @@ export default function PlayScreen() {
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={commonStyles.screen}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text accessibilityRole="header" style={styles.title}>Подготовка к бою</Text>
           <Text style={styles.subtitle}>Выбери параметры своей тренировки.</Text>
