@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Alert, Pressable, Text, View } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 
@@ -15,8 +15,14 @@ import {
 } from './CollectionFormUI';
 
 import { makeStyles } from './CreateCollectionScreen.styles';
+import QuestionList from '../../components/collections/QuestionList';
 
 export default function ReviewCollectionScreen() {
+  const { source } = useLocalSearchParams();
+
+  const entryPoint = source === 'library'
+    ? 'library'
+    : 'play';
   const { draft, setDraft } = useCollectionDraft();
   const { request } = useAuth();
   const { colors } = useAppTheme();
@@ -30,10 +36,10 @@ export default function ReviewCollectionScreen() {
 
   const validationError = validateDraft(draft);
 
-  const canSave = !validationError && (
+  const canSave = !validationError && (!!draft.editingId || (
     draft.publicChoice === false
     || (draft.publicChoice === true && !!draft.accessKey)
-  );
+  ));
 
   function choosePrivate() {
     if (busyRef.current) return;
@@ -131,20 +137,26 @@ export default function ReviewCollectionScreen() {
     setError('');
 
     try {
-      await request('/collections', {
-        method: 'POST',
+      await request(draft.editingId ? `/collections/${draft.editingId}` : '/collections', {
+        method: draft.editingId ? 'PUT' : 'POST',
         body: {
+          version: draft.version,
           title: draft.title,
           questions: draft.questions.map(question => ({
             text: question.text,
             answers: question.answers,
             correctIndex: question.correctIndex,
+            sourceId: question.sourceId,
           })),
           accessKey: draft.publicChoice ? draft.accessKey : null,
         },
       });
 
-      router.dismissTo('/home');
+      if (draft.editingId) {
+        router.dismissTo({ pathname: '/collection/[id]', params: { id: draft.editingId, source: entryPoint, }, });
+      } else {
+        router.dismissTo('/home');
+      }
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -166,7 +178,15 @@ export default function ReviewCollectionScreen() {
 
         <FormButton
           label="Вернуться к редактированию"
-          onPress={() => router.replace('/create-collection')}
+          onPress={() => router.replace({
+            pathname: '/create-collection',
+            params: draft.editingId
+              ? {
+                  editId: draft.editingId,
+                  source: entryPoint,
+                }
+              : {},
+          })}
         />
       </FormPage>
     );
@@ -182,28 +202,7 @@ export default function ReviewCollectionScreen() {
         Вопросов: {draft.questions.length}. Проверь всё перед сохранением.
       </Text>
 
-      {draft.questions.map((question, questionIndex) => (
-        <View key={question.id} style={styles.card}>
-          <Text style={styles.sectionTitle}>
-            {questionIndex + 1}. {cleanText(question.text)}
-          </Text>
-
-          {question.answers.map((answer, answerIndex) => {
-            const correct = answerIndex === question.correctIndex;
-
-            return (
-              <Text
-                key={answerIndex}
-                style={correct ? styles.correct : styles.text}
-              >
-                {correct ? '✓ ' : '• '}
-                {cleanText(answer)}
-                {correct ? ' — правильный ответ' : ''}
-              </Text>
-            );
-          })}
-        </View>
-      ))}
+      <QuestionList questions={draft.questions} />
 
       <FormButton
         label="Редактировать вопросы"
@@ -212,7 +211,7 @@ export default function ReviewCollectionScreen() {
         onPress={() => router.back()}
       />
 
-      <View style={styles.card}>
+      {!draft.editingId && <View style={styles.card}>
         <View style={styles.answerRow}>
           <Text style={[styles.sectionTitle, styles.flex]}>
             Создать публичный ключ?
@@ -273,7 +272,7 @@ export default function ReviewCollectionScreen() {
             </Text>
           </>
         )}
-      </View>
+      </View>}
 
       {!!error && (
         <Text accessibilityLiveRegion="polite" style={styles.error}>
@@ -282,7 +281,7 @@ export default function ReviewCollectionScreen() {
       )}
 
       <FormButton
-        label={busy ? 'Подожди…' : 'Сохранить коллекцию'}
+        label={busy ? 'Подожди…' : draft.editingId ? 'Сохранить изменения' : 'Сохранить коллекцию'}
         disabled={busy || !canSave}
         onPress={saveCollection}
       />

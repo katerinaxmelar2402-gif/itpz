@@ -107,12 +107,20 @@ export default function AuthScreen({ register = false }) {
           </Text>
 
           {!register && (
-            <Image source={require('../../../assets/login-mascot.png')} style={styles.mascot} />
+            <View style={styles.mascotCircle}>
+              <Image
+                source={require('../../../assets/mascots/yellow-hero.png')}
+                style={styles.mascot}
+                resizeMode="contain"
+                accessible={false}
+              />
+              <Text style={styles.mascotSparkle} accessible={false}>✦</Text>
+            </View>
           )}
 
-          <Text style={styles.heading}>{register ? 'Создай аккаунт' : 'С возвращением!'}</Text>
+          <Text style={styles.heading}>{register ? 'Создай аккаунт' : 'Итопиз'}</Text>
           <Text style={styles.subtitle}>
-            {register ? 'Начни свою первую тренировку.' : 'Продолжим твою тренировку.'}
+            {register ? 'Начни свою первую тренировку.' : 'Интеллекуальный тренажер проверки знаний.'}
           </Text>
 
           <View style={styles.form}>

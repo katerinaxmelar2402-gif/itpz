@@ -157,14 +157,14 @@ export default function ProfileRoute() {
         showsHorizontalScrollIndicator={false}
       >
         <View style={styles.identity}>
-          <Image
-            source={require('../../../assets/login-mascot.png')}
-            resizeMode="contain"
-            style={[styles.avatar, {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-            }]}
-          />
+          <View style={[styles.avatar, { backgroundColor: colors.consentBackground }]}>
+            <Image
+              source={require('../../../assets/mascots/yellow-hero.png')}
+              resizeMode="contain"
+              style={styles.avatarMascot}
+              accessible={false}
+            />
+          </View>
           <Text style={[styles.name, { color: colors.text }]}>{user.name}</Text>
           <Text style={[styles.email, { color: colors.muted }]}>{user.email}</Text>
         </View>

@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 
 import { useAppTheme } from '../../../ui/theme';
 
@@ -8,9 +8,11 @@ import {
 
 export default function CreateCollectionLayout() {
   const { colors } = useAppTheme();
+  const { editId } = useLocalSearchParams();
+  const collectionId = typeof editId === 'string' ? editId : '';
 
   return (
-    <CollectionDraftProvider>
+    <CollectionDraftProvider key={collectionId || 'new'} editId={collectionId}>
       <Stack
         screenOptions={{
           headerStyle: {
@@ -26,7 +28,7 @@ export default function CreateCollectionLayout() {
         <Stack.Screen
           name="index"
           options={{
-            title: 'Новая коллекция',
+            title: collectionId ? 'Редактирование коллекции' : 'Новая коллекция',
           }}
         />
 

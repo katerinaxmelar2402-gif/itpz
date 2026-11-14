@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 import {
   ActivityIndicator,
   Animated,
@@ -30,7 +31,19 @@ export function CollectionCard({ collection, onPress }) {
         <Text style={styles.muted}>
           {collection.questionCount} вопросов
           {' · '}
-          {collection.isBuiltIn ? 'От Итопиз' : 'Моя коллекция'}
+
+          {collection.isBuiltIn
+            ? 'От Итопиз'
+            : collection.isOwner
+              ? 'Моя коллекция'
+              : 'Добавлена по ключу'}
+
+          {!collection.isBuiltIn && (
+            <>
+              {' · '}
+              {collection.isPublic ? 'Публичная' : 'Личная'}
+            </>
+          )}
         </Text>
       </View>
 
@@ -138,7 +151,7 @@ export function CollectionDialog({
 }) {
   const { colors } = useAppTheme();
   const styles = makeStyles(colors);
-  const transition = useRef(new Animated.Value(0)).current;
+  const [transition] = useState(() => new Animated.Value(0));
   const isPicker = mode === 'picker';
   const lastGame = collection?.lastGame;
 
@@ -259,9 +272,20 @@ export function CollectionDialog({
                     {actions.map((label, index) => (
                       <Pressable
                         key={label}
-                        disabled
+                        disabled={index !== 2 || !collection}
                         accessibilityRole="button"
-                        accessibilityState={{ disabled: true }}
+                        accessibilityState={{ disabled: index !== 2 || !collection }}
+                        onPress={() => {
+                          onClose();
+
+                          router.push({
+                            pathname: '/collection/[id]',
+                            params: {
+                              id: collection.id,
+                              source: 'play',
+                            },
+                          });
+                        }}
                         style={[
                           styles.secondaryButton,
                           index === 0 && styles.primaryButton,

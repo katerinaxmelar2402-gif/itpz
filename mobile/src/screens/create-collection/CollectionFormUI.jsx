@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 import {
   KeyboardAvoidingView,
@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '../../../ui/theme';
+import { useAuth } from '../../auth/AuthProvider';
 import { makeStyles } from './CreateCollectionScreen.styles';
 
 const DraftContext = createContext(null);
@@ -86,7 +87,12 @@ export function validateDraft(draft) {
   return '';
 }
 
-export function CollectionDraftProvider({ children }) {
+export function CollectionDraftProvider({ children, editId = '' }) {
+  const { request } = useAuth();
+  const { colors } = useAppTheme();
+  const styles = makeStyles(colors);
+  const [loadError, setLoadError] = useState('');
+  const [attempt, setAttempt] = useState(0);
   const [draft, setDraft] = useState({
     title: '',
     questions: [],
@@ -94,6 +100,47 @@ export function CollectionDraftProvider({ children }) {
     publicChoice: null,
     accessKey: '',
   });
+
+  useEffect(() => {
+    if (!editId) return;
+    let active = true;
+    request(`/collections/${encodeURIComponent(editId)}`)
+      .then(({ collection }) => {
+        if (!collection.canEdit) {
+          throw new Error('Можно редактировать только свои коллекции.');
+        }
+        if (active) setDraft({
+          editingId: collection.id,
+          version: collection.version,
+          canDelete: collection.canDelete && collection.isOwner,
+          title: collection.title,
+          questions: collection.questions.map((question, index) => ({
+            ...question, sourceId: question.id, id: index + 1,
+          })),
+          nextQuestionId: collection.questions.length + 1,
+          publicChoice: !!collection.accessKey,
+          accessKey: collection.accessKey || '',
+        });
+      })
+      .catch(reason => {
+        if (active) setLoadError(reason.message || 'Не удалось загрузить коллекцию.');
+      });
+    return () => { active = false; };
+  }, [editId, request, attempt]);
+
+  if (editId && draft.editingId !== editId) {
+    return (
+      <FormPage>
+        <Text style={styles.hint}>{loadError || 'Загружаем коллекцию…'}</Text>
+        {!!loadError && (
+          <FormButton label="Повторить" onPress={() => {
+            setLoadError('');
+            setAttempt(value => value + 1);
+          }} />
+        )}
+      </FormPage>
+    );
+  }
 
   return (
     <DraftContext.Provider value={{ draft, setDraft }}>

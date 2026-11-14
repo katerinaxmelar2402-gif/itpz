@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
-import { router } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
-
+import { router, useLocalSearchParams } from 'expo-router';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { useAuth } from '../../auth/AuthProvider';
 import { useAppTheme } from '../../../ui/theme';
 
@@ -18,6 +17,17 @@ import { makeStyles } from './CreateCollectionScreen.styles';
 
 export default function CreateCollectionScreen() {
   const { draft, setDraft } = useCollectionDraft();
+  const { source } = useLocalSearchParams();
+
+  const entryPoint = source === 'library'
+    ? 'library'
+    : 'play';
+
+  const canDelete = (
+    !!draft.editingId
+    && draft.canDelete === true
+    && entryPoint === 'library'
+  );
   const { request } = useAuth();
   const { colors } = useAppTheme();
   const styles = makeStyles(colors);
@@ -107,6 +117,54 @@ export default function CreateCollectionScreen() {
     });
   }
 
+  async function deleteCollection() {
+    if (busyRef.current || !canDelete) return;
+
+    busyRef.current = true;
+    setBusy(true);
+    setError('');
+
+    try {
+      await request(
+        `/collections/${encodeURIComponent(draft.editingId)}`,
+        { method: 'DELETE' },
+      );
+
+      router.dismissTo('/collections');
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : 'Не удалось удалить коллекцию.',
+      );
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
+
+  function confirmDelete() {
+    if (busyRef.current || !canDelete) return;
+
+    Alert.alert(
+      'Удалить коллекцию?',
+      `«${draft.title}» будет удалена целиком. `
+      + 'Доступ по публичному ключу прекратится. '
+      + 'История прошлых игр сохранится.',
+      [
+        {
+          text: 'Отмена',
+          style: 'cancel',
+        },
+        {
+          text: 'Удалить',
+          style: 'destructive',
+          onPress: deleteCollection,
+        },
+      ],
+    );
+  }
+
   async function goToReview() {
     if (busyRef.current) return;
 
@@ -124,10 +182,13 @@ export default function CreateCollectionScreen() {
     try {
       await request('/collections/check-title', {
         method: 'POST',
-        body: { title: draft.title },
+        body: { title: draft.title, excludeId: draft.editingId },
       });
 
-      router.push('/create-collection/review');
+      router.push({
+        pathname: '/create-collection/review',
+        params: draft.editingId ? { editId: draft.editingId, source: entryPoint, } : {},
+      });
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -143,7 +204,7 @@ export default function CreateCollectionScreen() {
   return (
     <FormPage>
       <Text accessibilityRole="header" style={styles.title}>
-        Создай свою коллекцию
+        {draft.editingId ? 'Редактируй коллекцию' : 'Создай свою коллекцию'}
       </Text>
 
       <FormField
@@ -186,58 +247,53 @@ export default function CreateCollectionScreen() {
             const selected = question.correctIndex === answerIndex;
 
             return (
-              <View key={answerIndex} style={styles.answerRow}>
-                <Pressable
-                  accessibilityRole="radio"
-                  accessibilityLabel={
-                    `Выбрать ответ ${answerIndex + 1} правильным`
-                  }
-                  accessibilityState={{
-                    checked: selected,
-                    disabled: busy,
-                  }}
-                  disabled={busy}
-                  onPress={() =>
-                    updateQuestion(question.id, current => ({
-                      ...current,
-                      correctIndex: answerIndex,
-                    }))
-                  }
-                  style={styles.iconButton}
-                >
-                  <Text
-                    style={[
-                      styles.radio,
-                      selected && styles.selectedRadio,
-                    ]}
-                  >
-                    {selected ? '●' : '○'}
-                  </Text>
-                </Pressable>
-
-                <View style={styles.flex}>
-                  <FormField
-                    label={`Ответ ${answerIndex + 1}`}
-                    value={answer}
-                    maxLength={LIMITS.answer}
-                    editable={!busy}
-                    onChangeText={text =>
+              <View
+                key={answerIndex}
+                style={[
+                  styles.answerCard,
+                  selected && styles.selectedAnswerCard,
+                ]}
+              >
+                <View style={styles.answerRow}>
+                  <Pressable
+                    accessibilityRole="radio"
+                    accessibilityLabel={
+                      `Выбрать ответ ${answerIndex + 1} правильным`
+                    }
+                    accessibilityState={{
+                      checked: selected,
+                      disabled: busy,
+                    }}
+                    disabled={busy}
+                    onPress={() =>
                       updateQuestion(question.id, current => ({
                         ...current,
-                        answers: current.answers.map(
-                          (value, index) =>
-                            index === answerIndex ? text : value,
-                        ),
+                        correctIndex: answerIndex,
                       }))
                     }
-                  />
-
-                  {selected && (
-                    <Text style={styles.correct}>
-                      Правильный ответ
-                    </Text>
-                  )}
-                </View>
+                    style={({ pressed }) => [
+                      styles.answerSelector,
+                      busy && styles.disabled,
+                      pressed && styles.pressed,
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.radio,
+                        selected && styles.selectedRadio,
+                      ]}
+                    >
+                      {selected && <View style={styles.radioDot} />}
+                  </View>
+                  <Text
+                    style={[
+                      styles.answerSelectorText,
+                      selected && styles.selectedAnswerText,
+                    ]}
+                  >
+                    {selected ? 'Правильный ответ' : 'Выбрать правильным'}
+                  </Text>
+                </Pressable>
 
                 {question.answers.length > LIMITS.minAnswers && (
                   <Pressable
@@ -254,12 +310,29 @@ export default function CreateCollectionScreen() {
                     <Text style={styles.removeText}>×</Text>
                   </Pressable>
                 )}
+                </View>
+
+                <FormField
+                  label={`Ответ ${answerIndex + 1}`}
+                  value={answer}
+                  maxLength={LIMITS.answer}
+                  editable={!busy}
+                  onChangeText={text =>
+                    updateQuestion(question.id, current => ({
+                      ...current,
+                      answers: current.answers.map(
+                        (value, index) =>
+                          index === answerIndex ? text : value,
+                      ),
+                    }))
+                  }
+                />
               </View>
             );
           })}
 
           <Text style={styles.hint}>
-            Нажми на кружок рядом с правильным ответом.
+            Нажми «Выбрать правильным» у одного из ответов.
           </Text>
 
           {question.answers.length < LIMITS.maxAnswers && (
@@ -327,6 +400,15 @@ export default function CreateCollectionScreen() {
         }
         onPress={goToReview}
       />
+
+      {canDelete && (
+        <FormButton
+          label="Удалить коллекцию"
+          secondary
+          disabled={busy}
+          onPress={confirmDelete}
+        />
+      )}
     </FormPage>
   );
 }

@@ -96,13 +96,57 @@ export const makeStyles = colors => StyleSheet.create({
     justifyContent: 'center',
   },
 
-  radio: {
+  answerCard: {
+    padding: 12,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 14,
+  },
+
+  selectedAnswerCard: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accent + '0D',
+  },
+
+  answerSelector: {
+    flex: 1,
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+
+  answerSelectorText: {
+    flexShrink: 1,
     color: colors.muted,
-    fontSize: 30,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  selectedAnswerText: {
+    color: colors.accent,
+  },
+
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: colors.muted,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   selectedRadio: {
-    color: colors.accent,
+    borderColor: colors.accent,
+  },
+
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.accent,
   },
 
   correct: {

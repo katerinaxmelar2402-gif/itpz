@@ -38,6 +38,16 @@ function Navigation() {
         <Stack.Protected guard={!!session}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
+            name="collection/[id]"
+            options={{
+              headerShown: true,
+              title: 'Просмотр вопросов',
+              headerStyle: { backgroundColor: colors.background },
+              headerTintColor: colors.text,
+              headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
             name="create-collection"
             options={{ headerShown: false }}
           />

@@ -1,4 +1,5 @@
 import { Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '../../../ui/theme';
@@ -40,6 +41,13 @@ export default function CollectionsScreen() {
         {!library.loading && !library.error && (
           <CollectionBrowser
             collections={sortCollectionsByTitle(library.collections)}
+            onSelect={collection => router.push({
+              pathname: '/collection/[id]',
+              params: {
+                id: collection.id,
+                source: 'library',
+              },
+            })}
           />
         )}
       </View>

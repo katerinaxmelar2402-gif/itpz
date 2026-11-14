@@ -2,6 +2,7 @@ const { Router } = require('express');
 const pool = require('../db');
 const { readToken, findSessionUser } = require('../auth/sessions');
 const createRoutes = require('./create');
+const manageRoutes = require('./manage');
 
 const router = Router();
 
@@ -76,6 +77,8 @@ router.get('/', async (req, res) => {
       collection.title,
       collection.description,
       collection.system_code,
+      collection.author_id,
+      collection.visibility,
       DATE_FORMAT(
         COALESCE(
             (
@@ -146,6 +149,8 @@ router.get('/', async (req, res) => {
       description: row.description,
       questionCount: Number(row.question_count),
       isBuiltIn: row.system_code !== null,
+      isOwner: String(row.author_id) === String(userId),
+      isPublic: row.visibility === 'public',
       lastGame: row.session_id === null ? null : {
         sessionId: String(row.session_id),
         initialHp: Number(row.initial_hp),
@@ -160,6 +165,7 @@ router.get('/', async (req, res) => {
 });
 
 router.use('/', createRoutes);
+router.use('/', manageRoutes);
 module.exports = router;
 
 //Завершённая игра: status = completed

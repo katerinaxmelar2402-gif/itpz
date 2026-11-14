@@ -80,6 +80,12 @@ export default function HomeScreen() {
           <Text accessibilityRole="header" style={styles.title}>
             Что сегодня{'\n'}прокачаем?
           </Text>
+          <Image
+            source={require('../../../assets/mascots/purple-stars.png')}
+            style={styles.stars}
+            resizeMode="contain"
+            accessible={false}
+          />
         </View>
 
         <View style={styles.battleCard}>
@@ -95,7 +101,7 @@ export default function HomeScreen() {
             </View>
 
             <Image
-              source={require('../../../assets/login-mascot.png')}
+              source={require('../../../assets/mascots/coral-fox.png')}
               style={styles.mascot}
               resizeMode="contain"
               accessible={false}

@@ -31,10 +31,16 @@ export const makeStyles = (colors, dark) => {
       marginBottom: 18,
     },
     title: {
+      flex: 1,
       color: colors.text,
       fontSize: 32,
       lineHeight: 38,
       fontWeight: '700',
+    },
+    stars: {
+      width: 76,
+      height: 76,
+      flexShrink: 0,
     },
     avatar: {
       width: 48,

@@ -3,12 +3,19 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   content: { paddingTop: 16, paddingBottom: 24, gap: 16 },
   identity: { alignItems: 'center', gap: 6, paddingVertical: 12 },
-  avatar: { width: 112, height: 112, borderRadius: 56, borderWidth: 1 },
+  avatar: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatarMascot: { width: 68, height: 74, marginTop: 8 },
   name: { fontSize: 22, fontWeight: '700', textAlign: 'center' },
   email: { textAlign: 'center' },
   card: { borderWidth: 1, borderRadius: 16, padding: 16, gap: 12 },
   heading: { fontSize: 18, fontWeight: '700' },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   action: { minHeight: 44, justifyContent: 'center' },
   disabled: { opacity: 0.5 },
   row: {
