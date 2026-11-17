@@ -1,0 +1,182 @@
+import { StyleSheet } from 'react-native';
+export function makeStyles(colors, dark = false) {
+  return StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: { padding: 24, gap: 20, paddingBottom: 36 },
+    battleContent: { padding: 16, paddingBottom: 32 },
+    battleTarget: { flex: 1 },
+    pauseLayer: {
+      ...StyleSheet.absoluteFill,
+      zIndex: 10, padding: 24, alignItems: 'center', justifyContent: 'center',
+    },
+    pauseBlur: { ...StyleSheet.absoluteFill },
+    orderOptions: { flexDirection: 'row', gap: 10 },
+    orderOption: {
+      flex: 1, minHeight: 48, padding: 12, borderRadius: 12,
+      borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
+    },
+    orderSelected: { borderColor: colors.primary, backgroundColor: colors.consentBackground },
+    loading: { justifyContent: 'center', padding: 24, gap: 16 },
+
+    title: {
+      color: colors.text,
+      fontSize: 27,
+      fontWeight: '700',
+    },
+    text: { color: colors.text, fontSize: 16 },
+    muted: { color: colors.muted, fontSize: 14, lineHeight: 21 },
+    link: { color: colors.primary, fontSize: 16, paddingVertical: 8 },
+    error: { color: colors.error, fontSize: 14, lineHeight: 21 },
+
+    card: {
+      padding: 18,
+      gap: 12,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+    },
+    cardTitle: {
+      color: colors.text,
+      fontSize: 17,
+      fontWeight: '700',
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+
+    button: {
+      minHeight: 52,
+      paddingHorizontal: 18,
+      paddingVertical: 14,
+      borderRadius: 15,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.primary,
+    },
+    buttonText: {
+      color: colors.onPrimary,
+      fontSize: 16,
+      fontWeight: '700',
+      textAlign: 'center',
+    },
+    secondaryButton: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    secondaryButtonText: { color: colors.text },
+
+    header: {
+      minHeight: 56,
+      marginBottom: 16,
+      paddingHorizontal: 8,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 16,
+    },
+    headerTitle: {
+      flex: 1,
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    pauseButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+    },
+
+    questionBlock: { paddingHorizontal: 8, paddingTop: 28 },
+    questionLabel: {
+      color: colors.muted,
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.7,
+    },
+    question: {
+      color: colors.text,
+      fontSize: 25,
+      lineHeight: 33,
+      fontWeight: '700',
+      marginTop: 20,
+      marginBottom: 26,
+    },
+    answers: { gap: 10 },
+    answer: {
+      minHeight: 55,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      gap: 14,
+      borderWidth: 1,
+      borderRadius: 15,
+    },
+    answerLetter: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    letterText: {
+      color: colors.text,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    answerText: {
+      flex: 1,
+      color: colors.text,
+      fontSize: 16,
+      lineHeight: 22,
+      fontWeight: '600',
+    },
+    answerMark: {
+      color: colors.text,
+      fontSize: 21,
+      fontWeight: '700',
+    },
+
+    result: { padding: 16, gap: 20, paddingTop: 32 },
+    overlay: {
+      flex: 1,
+      padding: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(0,0,0,0.45)',
+    },
+    dialog: {
+      width: '100%',
+      maxWidth: 420,
+      padding: 24,
+      gap: 18,
+      borderRadius: 24,
+      backgroundColor: colors.background,
+    },
+    dimmed: { opacity: 0.6 },
+    pressed: { opacity: 0.7 },
+    pauseDisabled: { opacity: 0.45 },
+    timeSetting: { marginTop: 20 },
+    answerDefault: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+    answerCorrect: {
+      backgroundColor: dark ? '#284B37' : '#E2EBDD',
+      borderColor: '#76A17C',
+    },
+    answerWrong: {
+      backgroundColor: dark ? '#5B3036' : '#F6DEDA',
+      borderColor: colors.error,
+    },
+    letterDefault: { backgroundColor: colors.consentBackground },
+    letterCorrect: { backgroundColor: '#93B995' },
+    letterWrong: { backgroundColor: '#DB9B87' },
+  });
+}

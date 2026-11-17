@@ -2,6 +2,7 @@ const express = require('express');
 const pool = require('./db');
 const authRoutes = require('./auth/routes');
 const collectionRoutes = require('./collections/routes');
+const gameRoutes = require('./games/routes');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -30,6 +31,14 @@ app.use(
   collectionRoutes,
 );
 
-app.listen(port, '127.0.0.1', () => {
-  console.log(`Сервер запущен: http://127.0.0.1:${port}`);
+app.use(
+  '/api/games',
+  express.json({ limit: '1mb' }),
+  gameRoutes,
+);
+
+const host = process.env.HOST || '127.0.0.1';
+
+app.listen(port, host, () => {
+  console.log(`Сервер запущен: http://${host}:${port}`);
 });

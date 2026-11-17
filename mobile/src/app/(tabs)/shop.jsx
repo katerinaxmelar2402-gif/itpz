@@ -1,5 +1,5 @@
-import SectionScreen from '../../screens/SectionScreen';
+import ShopScreen from '../../screens/shop/ShopScreen';
 
 export default function ShopRoute() {
-  return <SectionScreen title="Магазин" />;
+  return <ShopScreen />;
 }

@@ -1,5 +1,5 @@
-import SectionScreen from '../../screens/SectionScreen';
+import StatisticsScreen from '../../screens/statistics/StatisticsScreen';
 
 export default function StatisticsRoute() {
-  return <SectionScreen title="Статистика" />;
+  return <StatisticsScreen />;
 }

@@ -3,6 +3,7 @@ const pool = require('../db');
 const { readToken, findSessionUser } = require('../auth/sessions');
 const createRoutes = require('./create');
 const manageRoutes = require('./manage');
+const connectRoutes = require('./connect');
 
 const router = Router();
 
@@ -165,6 +166,7 @@ router.get('/', async (req, res) => {
 });
 
 router.use('/', createRoutes);
+router.use('/', connectRoutes);
 router.use('/', manageRoutes);
 module.exports = router;
 

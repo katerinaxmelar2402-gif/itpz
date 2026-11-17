@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import {
   Image,
   Pressable,
@@ -8,6 +8,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import purpleStars from '../../../assets/mascots/purple-stars.png';
+import coralFox from '../../../assets/mascots/coral-fox.png';
 
 import { useAppTheme } from '../../../ui/theme';
 import {
@@ -25,14 +27,19 @@ export default function HomeScreen() {
   const { colors, commonStyles, dark } = useAppTheme();
   const styles = makeStyles(colors, dark);
   const library = useCollections();
+  const { repeatSessionId } = useLocalSearchParams();
 
   // null — окно закрыто;
   // picker — выбор коллекции;
   // details — информация о выбранной коллекции.
   const [dialog, setDialog] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
-
-  const selectedCollection = library.collections.find(
+  const repeatCollection = typeof repeatSessionId === 'string'
+    ? library.collections.find(collection =>
+        String(collection.lastGame?.sessionId) === repeatSessionId
+      )
+    : null;
+  const selectedCollection = repeatCollection ?? library.collections.find(
     collection => collection.id === selectedId,
   );
 
@@ -57,11 +64,13 @@ export default function HomeScreen() {
   const isReady = !library.loading && !library.error;
 
   function showCollection(collection) {
+    router.setParams({ repeatSessionId: undefined });
     setSelectedId(collection.id);
     setDialog('details');
   }
 
   function closeDialog() {
+    router.setParams({ repeatSessionId: undefined });
     setDialog(null);
     setSelectedId(null);
   }
@@ -81,7 +90,7 @@ export default function HomeScreen() {
             Что сегодня{'\n'}прокачаем?
           </Text>
           <Image
-            source={require('../../../assets/mascots/purple-stars.png')}
+            source={purpleStars}
             style={styles.stars}
             resizeMode="contain"
             accessible={false}
@@ -101,7 +110,7 @@ export default function HomeScreen() {
             </View>
 
             <Image
-              source={require('../../../assets/mascots/coral-fox.png')}
+            source={coralFox}
               style={styles.mascot}
               resizeMode="contain"
               accessible={false}
@@ -114,7 +123,7 @@ export default function HomeScreen() {
             onPress={() => setDialog('picker')}
             style={({ pressed }) => [
               styles.battleButton,
-              !isReady && { opacity: 0.55 },
+              !isReady && styles.disabled,
               pressed && styles.pressed,
             ]}
           >
@@ -205,9 +214,10 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      {dialog && isReady && (
+      {(dialog || repeatCollection) && isReady && (
         <CollectionDialog
-          mode={dialog}
+          repeatSessionId={repeatCollection ? repeatSessionId : null}
+          mode={repeatCollection ? 'details' : dialog}
           collection={selectedCollection}
           collections={sortCollectionsByAdded(library.collections)}
           onClose={closeDialog}

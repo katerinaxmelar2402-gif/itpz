@@ -205,11 +205,26 @@ export default function CollectionDetailsScreen() {
             />
           )}
 
-          <FormButton label="Играть" disabled />
+          <FormButton
+            label="Играть"
+            onPress={() => router.push({
+              pathname: '/battle/[id]',
+              params: {
+                id: collection.id,
+              },
+            })}
+          />
 
-          <Text style={styles.hint}>
-            Запуск игры скоро появится.
-          </Text>
+          <FormButton
+            label="Настроить игру"
+            secondary
+            onPress={() => router.push({
+              pathname: '/play/[id]',
+              params: {
+                id: collection.id,
+              },
+            })}
+          />
         </>
       )}
     </FormPage>

@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../ui/theme';
 import { AuthProvider, useAuth } from '../auth/AuthProvider';
 import { SettingsProvider, useSettings } from '../settings/SettingsProvider';
+import BattleSync from '../game/BattleSync';
+import { AudioProvider } from '../settings/AudioProvider';
 
 function Navigation() {
   const { session, loading, error, retry } = useAuth();
@@ -37,6 +39,7 @@ function Navigation() {
         </Stack.Protected>
         <Stack.Protected guard={!!session}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="statistics-collections" />
           <Stack.Screen
             name="collection/[id]"
             options={{
@@ -45,6 +48,20 @@ function Navigation() {
               headerStyle: { backgroundColor: colors.background },
               headerTintColor: colors.text,
               headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
+            name="play/[id]"
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="battle/[id]"
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
             }}
           />
           <Stack.Screen
@@ -101,7 +118,10 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <SettingsProvider>
-        <Navigation />
+        <AudioProvider>
+          <BattleSync />
+          <Navigation />
+        </AudioProvider>
       </SettingsProvider>
     </AuthProvider>
   );

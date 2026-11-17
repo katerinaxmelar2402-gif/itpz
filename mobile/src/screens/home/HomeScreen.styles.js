@@ -192,6 +192,9 @@ export const makeStyles = (colors, dark) => {
     pressed: {
       opacity: 0.75,
     },
+    disabled: {
+      opacity: 0.55,
+    },
     allButton: {
       minWidth: 48,
       minHeight: 44,

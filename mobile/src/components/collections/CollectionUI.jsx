@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '../../../ui/theme';
 import { filterCollections } from '../../collections/useCollections';
-import { makeStyles } from './CollectionUI.styles';
+import { makeStyles, dialogMotion } from './CollectionUI.styles';
 
 export function CollectionCard({ collection, onPress }) {
   const { colors } = useAppTheme();
@@ -148,12 +148,15 @@ export function CollectionDialog({
   collections,
   onClose,
   onSelect,
+  repeatSessionId = null,
 }) {
   const { colors } = useAppTheme();
   const styles = makeStyles(colors);
   const [transition] = useState(() => new Animated.Value(0));
   const isPicker = mode === 'picker';
-  const lastGame = collection?.lastGame;
+  const lastGame = repeatSessionId
+    && String(collection?.lastGame?.sessionId) === String(repeatSessionId)
+      ? collection.lastGame : null;
 
   useEffect(() => {
     transition.setValue(0);
@@ -204,17 +207,7 @@ export function CollectionDialog({
               style={[
                 styles.dialogInner,
                 isPicker && styles.pickerDialogInner,
-                {
-                  opacity: transition,
-                  transform: [
-                    {
-                      scale: transition.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0.98, 1],
-                      }),
-                    },
-                  ],
-                },
+                dialogMotion(transition),
               ]}
             >
               <View style={styles.dialogHeader}>
@@ -272,16 +265,37 @@ export function CollectionDialog({
                     {actions.map((label, index) => (
                       <Pressable
                         key={label}
-                        disabled={index !== 2 || !collection}
+                        disabled={!collection}
                         accessibilityRole="button"
-                        accessibilityState={{ disabled: index !== 2 || !collection }}
+                        accessibilityState={{ disabled: !collection }}
                         onPress={() => {
+                          if (!collection) return;
+
+                          const id = collection.id;
                           onClose();
+
+                          if (index === 0) {
+                            router.push({
+                              pathname: '/battle/[id]',
+                              params: {
+                                id,
+                                ...(lastGame
+                                  ? { repeatSessionId: lastGame.sessionId }
+                                  : {}),
+                              },
+                            });
+                            return;
+                          }
+
+                          if (index === 1) {
+                            router.push({ pathname: '/play/[id]', params: { id } });
+                            return;
+                          }
 
                           router.push({
                             pathname: '/collection/[id]',
                             params: {
-                              id: collection.id,
+                              id,
                               source: 'play',
                             },
                           });

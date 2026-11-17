@@ -1,5 +1,17 @@
 import { StyleSheet } from 'react-native';
 
+export function dialogMotion(transition) {
+  return {
+    opacity: transition,
+    transform: [{
+      scale: transition.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0.98, 1],
+      }),
+    }],
+  };
+}
+
 export const makeStyles = colors => StyleSheet.create({
   browser: {
     flex: 1,
@@ -86,7 +98,11 @@ export const makeStyles = colors => StyleSheet.create({
     justifyContent: 'center',
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.45)',
   },
   dialog: {
