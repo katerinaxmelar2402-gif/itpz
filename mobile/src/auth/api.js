@@ -10,18 +10,19 @@ export class ApiError extends Error {
 
 /**
  * @param {string} path
- * @param {{method?: string, body?: object, token?: string}} [options]
+ * @param {{method?: string, body?: object, token?: string, timeoutMs?: number}} [options]
  */
 export async function apiRequest(
   path,
-  { method = 'GET', body, token } = {},
+  { method = 'GET', body, token, timeoutMs = 15000 } = {},
 ) {
   if (!baseUrl) {
     throw new Error('Укажите EXPO_PUBLIC_API_URL в mobile/.env.');
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const multipart = body instanceof FormData;
 
   try {
     const response = await fetch(
@@ -30,10 +31,10 @@ export async function apiRequest(
         method,
         signal: controller.signal,
         headers: {
-          ...(body ? { 'Content-Type': 'application/json' } : {}),
+          ...(body && !multipart ? { 'Content-Type': 'application/json' } : {}),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: body ? JSON.stringify(body) : undefined,
+        body: body ? (multipart ? body : JSON.stringify(body)) : undefined,
       },
     );
 

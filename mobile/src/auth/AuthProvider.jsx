@@ -19,7 +19,7 @@ import { ApiError, apiRequest, authRequest } from './api';
  *   }) => Promise<void>,
  *   request: (
  *     path: string,
- *     options?: {method?: string, body?: object}
+ *     options?: {method?: string, body?: object, timeoutMs?: number}
  *   ) => Promise<any>,
  * }} AuthState
  */

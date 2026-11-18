@@ -55,9 +55,9 @@ export default function CreateMethodScreen() {
             <Text style={[styles.arrow, styles.manualAccent]}>→</Text>
           </Pressable>  
 
-          <View
+          <Pressable
             accessibilityRole="button"
-            accessibilityState={{ disabled: true }}
+            onPress={() => router.push('/create-collection/generate')}
             style={[styles.methodCard, styles.notesCard]}
           >
             <View style={styles.iconBox}>
@@ -76,7 +76,7 @@ export default function CreateMethodScreen() {
             </View>
 
             <Text style={[styles.arrow, styles.notesAccent]}>→</Text>
-          </View>
+          </Pressable>
         </View>
 
         <Text style={styles.footer}>

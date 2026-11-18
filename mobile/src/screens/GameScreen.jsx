@@ -54,7 +54,7 @@ function readSettings(params, profile) {
       DEFAULT_GAME.lives,
       { ...GAME_LIMITS.lives, min: 1 },
     ),
-    questionOrder: params.order === 'random' ? 'random' : 'ordered',
+    questionOrder: (params.order ?? profile.questionOrder) === 'random' ? 'random' : 'ordered',
   };
 }
 

@@ -73,11 +73,12 @@ router.post('/', async (req, res) => {
             created_at,
             updated_at
         )
-        VALUES (?, ?, 'manual', ?, 'ready', ?, NOW(), NOW(6))
+        VALUES (?, ?, ?, ?, 'ready', ?, NOW(), NOW(6))
         `,
         [
             res.locals.userId,
             collection.title,
+            req.body?.creationMethod === 'notes' ? 'notes' : 'manual',
             collection.accessKey ? 'public' : 'private',
             collection.accessKey,
         ],

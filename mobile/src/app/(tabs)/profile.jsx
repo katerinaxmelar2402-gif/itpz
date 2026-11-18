@@ -280,7 +280,6 @@ export default function ProfileRoute() {
           {[
             ['answerSeconds', 'Секунд на ответ'],
             ['lives', 'Количество жизней'],
-            ['questionCount', 'Количество вопросов'],
           ].map(([key, label]) => (
             <GameSlider
               key={key}
@@ -292,6 +291,41 @@ export default function ProfileRoute() {
               onChange={value => run(() => saveGame({ [key]: value }))}
             />
           ))}
+
+          <Text style={[styles.sliderLabel, { color: colors.text }]}>
+            Порядок вопросов
+          </Text>
+          <View accessibilityRole="radiogroup" style={styles.themeOptions}>
+            {[
+              ['ordered', 'По порядку'],
+              ['random', 'Вразнобой'],
+            ].map(([questionOrder, label]) => {
+              const selected = game.questionOrder === questionOrder;
+
+              return (
+                <Pressable
+                  key={questionOrder}
+                  accessibilityRole="radio"
+                  accessibilityLabel={label}
+                  accessibilityState={{ checked: selected, disabled: settingsDisabled }}
+                  disabled={settingsDisabled}
+                  onPress={() => run(() => saveGame({ questionOrder }))}
+                  style={[
+                    styles.themeOption,
+                    {
+                      backgroundColor: selected ? colors.accent : colors.surface,
+                      borderColor: selected ? colors.accent : colors.border,
+                    },
+                    settingsDisabled && styles.disabled,
+                  ]}
+                >
+                  <Text style={{ color: selected ? colors.onPrimary : colors.text }}>
+                    {label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
 
           <Action
             title="Вернуть базовые настройки"

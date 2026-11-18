@@ -13,7 +13,9 @@ const {
 function sendError(res, error) {
   if (error.code === 'ER_DUP_ENTRY') {
     return res.status(409).json({
-      message: 'У тебя уже есть коллекция с таким названием.',
+      message: String(error.sqlMessage).includes('uq_sets_access_key')
+        ? 'Этот ключ уже занят. Создай другой публичный ключ.'
+        : 'У тебя уже есть коллекция с таким названием.',
     });
   }
   if (!error.status) console.error('Ошибка коллекции:', error.code || error.message);
@@ -87,9 +89,19 @@ router.put('/:id', async (req, res) => {
         retained.add(id);
       }
     }
+    // Старые клиенты могут не передавать настройки доступа при правке вопросов.
+    const nextKey = Object.hasOwn(req.body, 'accessKey') ? data.accessKey : row.access_key;
+    const nextVisibility = nextKey ? 'public' : 'private';
     await db.execute(`
-      UPDATE question_sets SET title = ?, updated_at = NOW(6) WHERE id = ?
-    `, [data.title, row.id]);
+      UPDATE question_sets
+      SET title = ?, visibility = ?, access_key = ?, updated_at = NOW(6)
+      WHERE id = ?
+    `, [data.title, nextVisibility, nextKey, row.id]);
+    if (nextVisibility === 'private' || row.access_key !== nextKey) {
+      // Закрытие доступа и замена ключа отзывают прежние подключения.
+      // История игр хранится отдельно и не удаляется.
+      await db.execute('DELETE FROM set_connections WHERE set_id = ?', [row.id]);
+    }
     for (const question of existing.values()) {
       if (!retained.has(question.id)) {
         await db.execute('UPDATE questions SET deleted_at = NOW() WHERE id = ?', [question.id]);

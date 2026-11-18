@@ -113,12 +113,12 @@ router.get('/', async (req, res) => {
       AND (
         collection.system_code IS NOT NULL
         OR collection.author_id = ?
-        OR EXISTS (
+        OR (collection.visibility = 'public' AND EXISTS (
           SELECT 1
           FROM set_connections AS connection
           WHERE connection.user_id = ?
             AND connection.set_id = collection.id
-        )
+        ))
       )
     ORDER BY
       (collection.system_code IS NOT NULL) DESC,
@@ -166,6 +166,7 @@ router.get('/', async (req, res) => {
 });
 
 router.use('/', createRoutes);
+router.use('/', require('./generate'));
 router.use('/', connectRoutes);
 router.use('/', manageRoutes);
 module.exports = router;

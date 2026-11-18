@@ -36,10 +36,12 @@ export default function ReviewCollectionScreen() {
 
   const validationError = validateDraft(draft);
 
-  const canSave = !validationError && (!!draft.editingId || (
+  const canSave = !validationError && (
     draft.publicChoice === false
     || (draft.publicChoice === true && !!draft.accessKey)
-  ));
+  );
+
+  const showAccessSettings = !draft.editingId || entryPoint === 'library';
 
   function choosePrivate() {
     if (busyRef.current) return;
@@ -56,11 +58,12 @@ export default function ReviewCollectionScreen() {
 
   function showKeyHelp() {
     Alert.alert(
-      'Публичный ключ',
-      'Это код доступа к коллекции, которым можно поделиться. '
-      + 'Он предназначен для добавления коллекции через раздел '
-      + '«Есть ключ?». Ключ начнёт действовать после сохранения. '
-      + 'Без ключа коллекция останется личной.',
+      'Доступ к коллекции',
+      'Личная коллекция доступна только тебе. '
+      + 'Публичную коллекцию можно добавить по ключу. '
+      + 'Если сделать её личной, старый ключ перестанет работать, '
+      + 'а коллекция исчезнет из списков подключивших её пользователей. '
+      + 'Изменения вступают в силу после сохранения.',
     );
   }
 
@@ -71,12 +74,6 @@ export default function ReviewCollectionScreen() {
     setBusy(true);
     setError('');
     setCopied(false);
-
-    setDraft(current => ({
-      ...current,
-      publicChoice: true,
-      accessKey: '',
-    }));
 
     try {
       const result = await request('/collections/key', {
@@ -211,15 +208,15 @@ export default function ReviewCollectionScreen() {
         onPress={() => router.back()}
       />
 
-      {!draft.editingId && <View style={styles.card}>
+      {showAccessSettings && <View style={styles.card}>
         <View style={styles.answerRow}>
           <Text style={[styles.sectionTitle, styles.flex]}>
-            Создать публичный ключ?
+            Доступ к коллекции
           </Text>
 
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Что такое публичный ключ?"
+            accessibilityLabel="Как работает доступ к коллекции?"
             onPress={showKeyHelp}
             style={styles.iconButton}
           >
@@ -227,11 +224,19 @@ export default function ReviewCollectionScreen() {
           </Pressable>
         </View>
 
+        <Text style={styles.hint}>
+          {draft.publicChoice === true
+            ? 'Публичная — можно добавить по ключу.'
+            : draft.publicChoice === false
+              ? 'Личная — доступна только тебе.'
+              : 'Выбери, кому будет доступна коллекция.'}
+        </Text>
+
         <FormButton
           label={
             draft.publicChoice === false
-              ? '● Нет, оставить личной'
-              : '○ Нет, оставить личной'
+              ? '● Личная'
+              : '○ Сделать личной'
           }
           secondary={draft.publicChoice !== false}
           disabled={busy}
@@ -240,15 +245,16 @@ export default function ReviewCollectionScreen() {
 
         <FormButton
           label={
-            busy && draft.publicChoice === true && !draft.accessKey
-              ? 'Создаём ключ…'
-              : draft.accessKey
-                ? 'Создать другой ключ'
-                : 'Да, создать ключ'
+            draft.publicChoice === true && draft.accessKey
+              ? '● Публичная'
+              : '○ Сделать публичной'
           }
           secondary={draft.publicChoice !== true}
           disabled={busy}
-          onPress={generateKey}
+          onPress={() => {
+            if (draft.publicChoice === true && draft.accessKey) return;
+            generateKey();
+          }}
         />
 
         {draft.publicChoice === true && !!draft.accessKey && (
@@ -268,10 +274,25 @@ export default function ReviewCollectionScreen() {
             </Pressable>
 
             <Text style={styles.hint}>
-              Ключ начнёт действовать после сохранения коллекции.
+              {draft.accessKey === draft.originalAccessKey
+                ? 'Это действующий ключ коллекции.'
+                : 'Новый ключ начнёт действовать после сохранения.'}
             </Text>
           </>
         )}
+        {!!draft.originalAccessKey && (
+          draft.publicChoice === false
+          || draft.accessKey !== draft.originalAccessKey
+        ) && (
+          <Text style={styles.error}>
+            После сохранения прежний ключ перестанет работать.
+            Коллекция исчезнет из списков пользователей, которые добавили её раньше.
+          </Text>
+        )}
+
+        <Text style={styles.hint}>
+          Изменения доступа применятся после сохранения коллекции.
+        </Text>
       </View>}
 
       {!!error && (

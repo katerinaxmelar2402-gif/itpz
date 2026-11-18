@@ -118,8 +118,9 @@ export function CollectionDraftProvider({ children, editId = '' }) {
             ...question, sourceId: question.id, id: index + 1,
           })),
           nextQuestionId: collection.questions.length + 1,
-          publicChoice: !!collection.accessKey,
+          publicChoice: collection.isPublic,
           accessKey: collection.accessKey || '',
+          originalAccessKey: collection.accessKey || '',
         });
       })
       .catch(reason => {
@@ -202,6 +203,7 @@ export function FormField({
   maxLength,
   multiline = false,
   editable = true,
+  showCounter = true,
 }) {
   const { colors } = useAppTheme();
   const styles = makeStyles(colors);
@@ -230,9 +232,9 @@ export function FormField({
         ]}
       />
 
-      <Text style={styles.hint}>
+      {showCounter && <Text style={styles.hint}>
         {value.length}/{maxLength}
-      </Text>
+      </Text>}
     </View>
   );
 }

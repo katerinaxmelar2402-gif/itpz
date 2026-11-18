@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Polyline, Text as SvgText } from 'react-native-svg';
@@ -89,7 +89,7 @@ export default function StatisticsScreen({ byCollection = false }) {
 
   return <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
     <ScrollView contentContainerStyle={styles.content} refreshControl={
-      <RefreshControl refreshing={loading && !!data} onRefresh={() => setAttempt(value => value + 1)} tintColor={colors.primary} />
+      <RefreshControl refreshing={false} onRefresh={() => setAttempt(value => value + 1)} tintColor={colors.primary} />
     }>
       {byCollection && <Pressable accessibilityRole="button" onPress={() => router.back()}>
         <Text style={styles.secondaryText}>← Назад</Text>
@@ -99,7 +99,6 @@ export default function StatisticsScreen({ byCollection = false }) {
         <Text style={styles.subtitle}>{byCollection
           ? 'Последнее прохождение с учётом исправленных ошибок.' : 'Каждая тренировка помогает расти.'}</Text>
       </View>
-      {loading && !data && <ActivityIndicator style={styles.loading} color={colors.primary} />}
       {!!error && <View style={styles.card}>
         <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
         <Action styles={styles} onPress={() => setAttempt(value => value + 1)}>Повторить загрузку</Action>

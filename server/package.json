@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ai:models": "node scripts/check-gigachat.js --models",
+    "ai:check": "node scripts/check-gigachat.js --chat",
+    "ai:test": "node --test ai/gigachat.test.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +17,9 @@
     "dotenv": "^18.0.9",
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.3",
-    "mysql2": "^3.24.6"
+    "mammoth": "^1.13.0",
+    "multer": "^2.5.0",
+    "mysql2": "^3.24.6",
+    "pdf-parse": "^1.1.1"
   }
 }

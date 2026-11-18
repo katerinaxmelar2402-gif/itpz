@@ -27,7 +27,11 @@ async function findCollection(db, id, userId, lock = false) {
 
   if (
     !row
-    || (!isOwner && row.system_code === null && !row.is_connected)
+    || (
+      !isOwner
+      && row.system_code === null
+      && (row.visibility !== 'public' || !row.is_connected)
+    )
   ) {
     throw httpError(
       404,

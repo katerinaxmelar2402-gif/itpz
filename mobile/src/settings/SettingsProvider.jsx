@@ -5,13 +5,12 @@ import { useAuth } from '../auth/AuthProvider';
 export const GAME_LIMITS = {
   answerSeconds: { min: 5, max: 120 },
   lives: { min: 3, max: 20 },
-  questionCount: { min: 5, max: 20 },
 };
 
 export const DEFAULT_GAME = {
   answerSeconds: 30,
   lives: 8,
-  questionCount: 10,
+  questionOrder: 'ordered',
 };
 
 const DEFAULT_APP = { theme: 'light', sound: true, music: false };
@@ -47,7 +46,12 @@ export function SettingsProvider({ children }) {
   const data = stored ?? EMPTY;
   const userId = session?.user.id;
   const app = { ...DEFAULT_APP, ...data.app };
-  const game = { ...DEFAULT_GAME, ...data.games[userId] };
+  const savedGame = data.games[userId];
+  const game = {
+    answerSeconds: savedGame?.answerSeconds ?? DEFAULT_GAME.answerSeconds,
+    lives: savedGame?.lives ?? DEFAULT_GAME.lives,
+    questionOrder: savedGame?.questionOrder === 'random' ? 'random' : 'ordered',
+  };
 
   async function save(next) {
     if (!stored || error) throw new Error('Хранилище настроек недоступно.');

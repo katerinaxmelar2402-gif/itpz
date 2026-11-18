@@ -1,3 +1,4 @@
+require('./bootstrap-tls');
 const express = require('express');
 const pool = require('./db');
 const authRoutes = require('./auth/routes');

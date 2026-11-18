@@ -45,7 +45,7 @@ npm start
 
 ```powershell
 cd D:\itpz\server
-node index.js
+npm start
 ```
 
 Проверьте ответ сервера (http://127.0.0.1:3000/api/health) на компьютере. В ответе должно быть `"database": "connected"`. Если вы используете другой `PORT` в `server/.env`, подставьте его также в адрес для телефона и в команду `adb reverse`.

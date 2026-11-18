@@ -49,7 +49,7 @@ after(() => new Promise(resolve => server.close(resolve)));
 
 beforeEach(() => {
   row = { id: 10, author_id: 7, title: 'Моя коллекция', system_code: null,
-    version, is_connected: 0, access_key: null };
+    version, is_connected: 0, visibility: 'private', access_key: null };
   calls = [];
   failWrite = null;
 });
@@ -154,6 +154,7 @@ test('удаление владельцем мягкое и отключает �
 test('подключённую коллекцию можно только просматривать', async () => {
   row.author_id = 8;
   row.is_connected = 1;
+  row.visibility = 'public';
 
   const response = await fetch(baseUrl);
   assert.equal(response.status, 200);
@@ -174,4 +175,54 @@ test('подключённую коллекцию можно только про
     calls.some(call => typeof call === 'object'),
     false,
   );
+});
+
+test('личную коллекцию можно опубликовать с новым ключом', async () => {
+  const key = 'a'.repeat(48);
+  assert.equal((await update({ ...payload(), accessKey: key })).status, 200);
+  const write = calls.find(call => call.sql?.includes('UPDATE question_sets'));
+  assert.deepEqual(write.params, ['Новое название', 'public', key, 10]);
+  assert.ok(calls.includes('commit'));
+});
+
+test('закрытие публичной коллекции отзывает ключ и подключения в транзакции', async () => {
+  row.visibility = 'public';
+  row.access_key = 'a'.repeat(48);
+  assert.equal((await update({ ...payload(), accessKey: null })).status, 200);
+  const write = calls.find(call => call.sql?.includes('UPDATE question_sets'));
+  assert.deepEqual(write.params, ['Новое название', 'private', null, 10]);
+  assert.ok(calls.some(call => call.sql?.includes('DELETE FROM set_connections')
+    && call.params[0] === 10));
+  assert.ok(calls.includes('commit'));
+});
+
+test('даже оставшееся подключение не даёт прочитать личную коллекцию', async () => {
+  row.author_id = 8;
+  row.is_connected = 1;
+  row.visibility = 'private';
+  assert.equal((await fetch(baseUrl)).status, 404);
+});
+
+test('обычная правка публичной коллекции сохраняет её ключ и подключения', async () => {
+  row.visibility = 'public';
+  row.access_key = 'a'.repeat(48);
+  assert.equal((await update({ ...payload(), accessKey: row.access_key })).status, 200);
+  assert.ok(!calls.some(call => call.sql?.includes('DELETE FROM set_connections')));
+});
+
+test('повторная публикация с другим ключом не восстанавливает старые подключения', async () => {
+  row.visibility = 'public';
+  row.access_key = 'a'.repeat(48);
+  const key = 'b'.repeat(48);
+  assert.equal((await update({ ...payload(), accessKey: key })).status, 200);
+  assert.ok(calls.some(call => call.sql?.includes('DELETE FROM set_connections')));
+  assert.equal(calls.find(call => call.sql?.includes('UPDATE question_sets')).params[2], key);
+});
+
+test('старый клиент без настроек доступа не скрывает публичную коллекцию', async () => {
+  row.visibility = 'public';
+  row.access_key = 'a'.repeat(48);
+  assert.equal((await update(payload())).status, 200);
+  assert.equal(calls.find(call => call.sql?.includes('UPDATE question_sets')).params[2], row.access_key);
+  assert.ok(!calls.some(call => call.sql?.includes('DELETE FROM set_connections')));
 });

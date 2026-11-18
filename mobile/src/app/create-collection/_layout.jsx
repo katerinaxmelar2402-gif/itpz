@@ -38,6 +38,7 @@ export default function CreateCollectionLayout() {
             title: 'Проверка коллекции',
           }}
         />
+        <Stack.Screen name="generate" options={{ title: 'По конспекту' }} />
       </Stack>
     </CollectionDraftProvider>
   );
