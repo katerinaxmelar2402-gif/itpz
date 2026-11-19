@@ -1,6 +1,6 @@
 // Регистрирует аккаунт, выдаёт токены и завершает сессии. 
 // Регистрация требует имя, почту, пароль от 6 символов и согласие. 
-// Значение `course-v1` — метка версии согласия для учебного запуска.
+// Метка редакции согласия для новых регистраций учебного запуска.
 const { Router } = require('express');
 const pool = require('../db');
 const { hashPassword, verifyPassword } = require('./password');
@@ -38,7 +38,7 @@ router.post('/register', async (req, res) => {
 
     const [result] = await connection.execute(
       `INSERT INTO users (email, password_hash, name, status, consent_at, policy_version, created_at)
-       VALUES (?, ?, ?, 'active', UTC_TIMESTAMP(), 'course-v1', UTC_TIMESTAMP())`,
+       VALUES (?, ?, ?, 'active', UTC_TIMESTAMP(), 'course-v2-2026-11-19', UTC_TIMESTAMP())`,
       [data.email, passwordHash, name],
     );
 

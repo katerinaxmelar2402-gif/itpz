@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "Итопиз",
     "slug": "mobile",
-    "version": "1.0.0",
+    "version": "1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/itopiz-icon-1024.png",
     "userInterfaceStyle": "light",
     "scheme": "itpz",
     "plugins": [
@@ -18,15 +18,11 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      "versionCode": 1,
+      "icon": "./assets/itopiz-icon-1024.png"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/itopiz-icon-512.png"
     }
   }
 }

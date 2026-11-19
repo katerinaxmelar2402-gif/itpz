@@ -12,11 +12,6 @@ export const unstable_settings = { anchor: 'home' };
 /** @type {{ name: string, label: string, icon?: TabSymbol }[]} */
 const sections = [
   {
-    name: 'shop',
-    label: 'Магазин',
-    icon: { ios: 'bag.fill', android: 'storefront', web: 'storefront' },
-  },
-  {
     name: 'collections',
     label: 'Коллекции',
     icon: {

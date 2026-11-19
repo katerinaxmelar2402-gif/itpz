@@ -87,7 +87,7 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <Text accessibilityRole="header" style={styles.title}>
-            Что сегодня{'\n'}прокачаем?
+            Что прокачаем {'\n'}сегодня?
           </Text>
           <Image
             source={purpleStars}

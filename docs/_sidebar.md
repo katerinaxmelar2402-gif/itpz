@@ -6,4 +6,6 @@
     - [Генерация по конспекту](/guide/questions/generation/)
   - [Игровой бой](/guide/game/)
   - [Результаты и ошибки](/guide/results/)
-  - [Пример тренировки — вариант 5](/guide/example/)
+  - [Пример тренировки](/guide/example/)
+- [Политика конфиденциальности](/legal/privacy/)
+- [Согласие на обработку данных](/legal/consent/)

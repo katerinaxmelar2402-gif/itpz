@@ -335,6 +335,11 @@ export default function ProfileRoute() {
         </View>
 
         <View style={card}>
+          <Link href="/legal/privacy" asChild>
+            <Pressable accessibilityRole="link" style={styles.action}>
+              <Text style={commonStyles.linkText}>Политика конфиденциальности и обращения</Text>
+            </Pressable>
+          </Link>
           <Link href="/help" asChild>
             <Pressable accessibilityRole="link" style={styles.action}>
               <Text style={commonStyles.linkText}>Руководство пользователя</Text>
