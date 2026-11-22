@@ -161,3 +161,10 @@ dist/
 server/uploads/
 server/logs/
 database/backups/
+
+# Android signing keys must not be published.
+*.keystore
+*.jks
+/pepk.jar
+/pepk_out.zip
+/upload-certificate.pem

@@ -10,7 +10,14 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "recordAudioAndroid": false,
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
       "expo-asset",
       "expo-font"
     ],
@@ -18,7 +25,20 @@
       "supportsTablet": true
     },
     "android": {
-      "versionCode": 1,
+      "package": "ru.khmelyar.itopiz",
+      "versionCode": 3,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/itopiz-adaptive-foreground.png",
+        "backgroundColor": "#F0E7FA"
+      },
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
       "icon": "./assets/itopiz-icon-1024.png"
     },
     "web": {
